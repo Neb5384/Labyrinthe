@@ -43,8 +43,8 @@ object Maze {
      * 2 -> visited
      * 3 -> visited and backtracked
      */
-    val posX: Int = 0
-    val posY: Int = 0
+    var posX: Int = 0
+    var posY: Int = 0
     cells(0)(0) = 2
     var visitedAll: Boolean = false
     do{
@@ -83,7 +83,17 @@ object Maze {
       }
       println(validArray.mkString(" "))
 
-      println(randomInValid(validArray))
+      var direction: Int = randomInValid(validArray) // 0: left 1: down 2: right 3: up
+      println(direction)
+      direction match{
+        case 0 => posX -= 1
+        case 1 => posY -= 1
+        case 2 => posX += 1
+        case 3 => posY += 1
+      }
+
+      cells(posY)(posX) = 2
+      println(posX+" "+posY)
 
       visitedAll = true
       for (x <- cells; y <- x){
