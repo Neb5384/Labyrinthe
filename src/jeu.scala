@@ -10,7 +10,7 @@ object Display {
     for((x,xPos) <- grid.zipWithIndex;
         (y,yPos) <- x.zipWithIndex){
       if(y == 1){
-        JEU.gameWindow.drawFillRect(xPos*10,yPos*10,10,10)
+        JEU.gameWindow.drawFillRect(xPos*pixel_multiplicator,yPos*pixel_multiplicator,pixel_multiplicator,pixel_multiplicator)
       }
     }
   }
@@ -101,7 +101,7 @@ object JEU extends App{
   var WIDTH: Int = 15
   var HEIGHT: Int = 11
 
-  val gameWindow : FunGraphics = new FunGraphics(WIDTH*10,HEIGHT*10)
+  val gameWindow : FunGraphics = new FunGraphics(WIDTH*Display.pixel_multiplicator,HEIGHT*Display.pixel_multiplicator)
 
   var maze: Array[Array[Int]] = Maze.generateMaze(WIDTH,HEIGHT)
 
