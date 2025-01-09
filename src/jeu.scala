@@ -1,5 +1,5 @@
 import hevs.graphics.FunGraphics
 
-object Jeu extends App {
-  println("HelloWorld")
+object JEU extends App{
+
 }
