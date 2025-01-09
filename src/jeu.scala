@@ -23,11 +23,11 @@ object Maze {
     }
     var ran: Int = (math.random() * numOfValid).toInt
     var validcount: Int = 0
-    for (i <- array){
+    for (i <- array.indices){
       if (validcount == ran) return i
       if(array(i) == 1) validcount += 1
     }
-    0
+    15
   }
 
   def generateMaze(width: Int, height: Int): Array[Array[Int]] = {
