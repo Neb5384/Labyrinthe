@@ -21,11 +21,12 @@ object Maze {
     for (i <- array){
       if (i == 1) numOfValid += 1
     }
-    var ran: Int = (math.random() * numOfValid).toInt
+    var ran: Int = (math.random() * numOfValid).toInt + 1
     var validcount: Int = 0
     for (i <- array.indices){
-      if (validcount == ran) return i
       if(array(i) == 1) validcount += 1
+      if (validcount == ran) return i
+
     }
     15
   }
