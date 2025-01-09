@@ -5,11 +5,12 @@ import scala.runtime.BooleanRef
 
 class Display {}
 object Display {
+  val pixel_multiplicator:Int = 10
   def blit(grid: Array[Array[Int]]): Unit = {
     for((x,xPos) <- grid.zipWithIndex;
         (y,yPos) <- x.zipWithIndex){
       if(y == 1){
-        JEU.gameWindow.drawFillRect(xPos*10,yPos*10,10,10)
+        JEU.gameWindow.drawFillRect(xPos*pixel_multiplicator,yPos*pixel_multiplicator,pixel_multiplicator,pixel_multiplicator)
       }
     }
   }
@@ -34,7 +35,7 @@ object Maze {
     do{
       var validArray: Array[Int] = new Array[Int](4) // Array that stores which values are empty
       //left-down-right-up
-      if ((posX -1 < 0)||)
+      //if ((posX -1 < 0)||)
 
 
       visitedAll = true
@@ -50,14 +51,16 @@ object Maze {
 }
 
 object JEU extends App{
-  var WIDTH: Int = 15
-  var HEIGHT: Int = 11
+  var WIDTH: Int = 75
+  var HEIGHT: Int = 50
 
-  val gameWindow : FunGraphics = new FunGraphics(WIDTH*10,HEIGHT*10)
+  val gameWindow : FunGraphics = new FunGraphics(WIDTH*Display.pixel_multiplicator,HEIGHT*Display.pixel_multiplicator)
 
   var maze: Array[Array[Int]] = Maze.generateMaze(WIDTH,HEIGHT)
 
-  maze(2)(5) = 1
+  maze(WIDTH/2)(HEIGHT/2) = 1
+  maze(0)(0) = 1
+  maze(WIDTH-1)(HEIGHT-1) = 1
   Display.blit(maze)
 
 }
