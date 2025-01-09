@@ -7,7 +7,7 @@ object Display {
     for((x,xPos) <- grid.zipWithIndex;
         (y,yPos) <- x.zipWithIndex){
       if(y == 1){
-        JEU.gameWindow.drawFillRect(xPos,yPos,10,10)
+        JEU.gameWindow.drawFillRect(xPos*10,yPos*10,10,10)
       }
     }
   }
@@ -16,19 +16,26 @@ object Display {
 object Maze {
   def generateMaze(width: Int, height: Int): Array[Array[Int]] = {
     var maze: Array[Array[Int]] = Array.ofDim[Int](width, height)
-    return maze
+    /***
+     * 1 -> wall
+     * 0 -> visited
+     */
+    var initialPosX = 0
+    var initialPosy = 0
+
+    maze
   }
 }
 
 object JEU extends App{
-  var WIDTH: Int = 150
-  var HEIGHT: Int = 100
+  var WIDTH: Int = 15
+  var HEIGHT: Int = 11
 
-  val gameWindow : FunGraphics = new FunGraphics(WIDTH,HEIGHT)
+  val gameWindow : FunGraphics = new FunGraphics(WIDTH*10,HEIGHT*10)
 
   var maze: Array[Array[Int]] = Maze.generateMaze(WIDTH,HEIGHT)
 
-  maze(20)(50) = 1
+  maze(2)(5) = 1
   Display.blit(maze)
 
 }
