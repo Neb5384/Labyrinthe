@@ -166,19 +166,21 @@ object Maze {
 }
 
 object JEU extends App{
-  var WIDTH: Int = 16
+  var WIDTH: Int = 96
 
   if (WIDTH%2==0){
     WIDTH+=1
   }
-  var HEIGHT: Int = 16
+  var HEIGHT: Int = 96
   if (HEIGHT%2==0){
     HEIGHT+=1
   }
 
   val gameWindow : FunGraphics = new FunGraphics(WIDTH*Display.pixel_value,HEIGHT*Display.pixel_value)
 
-  var maze: Array[Array[Int]] = Maze.generateMaze(WIDTH,HEIGHT)
+  var visualize: Boolean = true
+
+  var maze: Array[Array[Int]] = Maze.generateMaze(WIDTH,HEIGHT,visualize)
   maze(WIDTH-2)(HEIGHT-2) = 5 //end of the maze
 
   while(maze(WIDTH-2)(HEIGHT-2) == 5){
