@@ -10,7 +10,7 @@ object Display {
     JEU.gameWindow.clear()
     for ((x, xPos) <- grid.zipWithIndex;
          (y, yPos) <- x.zipWithIndex) {
-      if (y == 1) { // 0 in the grid nothing
+      if (y == 1) { // 0 in the grid is a pathway
         JEU.gameWindow.setColor(Color.WHITE)
         JEU.gameWindow.drawFillRect(xPos*pixel_value, yPos*pixel_value, pixel_value, pixel_value)
       }
@@ -33,30 +33,10 @@ object Player{
   var x: Int = 1
   var y: Int = 1
 
-  def Nextpos {
-    JEU.maze(Player.x)(Player.y) = 0
-    JEU.gameWindow.setKeyManager(new KeyAdapter(){
-      override def keyReleased(e: KeyEvent): Unit = {
-        if (e.getKeyCode == KeyEvent.VK_UP) {
-          if(JEU.maze(Player.x)(Player.y-1) != 1) Player.y -= 1
-        }
-        if (e.getKeyCode == KeyEvent.VK_DOWN) {
-          if(JEU.maze(Player.x)(Player.y+1) != 1) Player.y += 1
-        }
-        if (e.getKeyCode == KeyEvent.VK_LEFT) {
-          if(JEU.maze(Player.x-1)(Player.y) != 1) Player.x -= 1
-        }
-        if (e.getKeyCode == KeyEvent.VK_RIGHT) {
-          if(JEU.maze(Player.x+1)(Player.y) != 1) Player.x += 1
-        }
-      }
-    })
+  def Nextpos(): Unit = {
     JEU.maze(Player.x)(Player.y) = 4
   }
-
 }
-
-
 object Maze {
 
   def randomInValid(array : Array[Int]): Int = {
@@ -167,7 +147,6 @@ object Maze {
 
 object JEU extends App{
   var WIDTH: Int = 16
-
   if (WIDTH%2==0){
     WIDTH+=1
   }
@@ -175,9 +154,24 @@ object JEU extends App{
   if (HEIGHT%2==0){
     HEIGHT+=1
   }
-
   val gameWindow : FunGraphics = new FunGraphics(WIDTH*Display.pixel_value,HEIGHT*Display.pixel_value)
-
+  gameWindow.setKeyManager(new KeyAdapter(){
+    override def keyPressed(e: KeyEvent): Unit = {
+      maze(Player.x)(Player.y) = 0
+      if (e.getKeyCode == KeyEvent.VK_UP) {
+        if(maze(Player.x)(Player.y-1) != 1) Player.y -= 1
+      }
+      if (e.getKeyCode == KeyEvent.VK_DOWN) {
+        if(maze(Player.x)(Player.y+1) != 1) Player.y += 1
+      }
+      if (e.getKeyCode == KeyEvent.VK_LEFT) {
+        if(maze(Player.x-1)(Player.y) != 1) Player.x -= 1
+      }
+      if (e.getKeyCode == KeyEvent.VK_RIGHT) {
+        if(maze(Player.x+1)(Player.y) != 1) Player.x += 1
+      }
+    }
+  })
   var maze: Array[Array[Int]] = Maze.generateMaze(WIDTH,HEIGHT)
   maze(WIDTH-2)(HEIGHT-2) = 5 //end of the maze
 
