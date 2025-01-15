@@ -39,6 +39,8 @@ object Player{
     JEU.maze(Player.x)(Player.y) = 4
   }
 }
+
+
 object Maze {
 
   def randomInValid(array : Array[Int]): Int = {
@@ -122,6 +124,7 @@ object Maze {
       }
 
       cells(posY)(posX) = 2
+      println(posX+" "+posY)
 
       visitedAll = true
       for (x <- cells; y <- x){
@@ -152,13 +155,11 @@ object JEU extends App{
   var largeur = Dialogs.getHiddenString("please enter the Width value").toInt
   var hauteur = Dialogs.getHiddenString("please enter the Height value").toInt
   var WIDTH: Int = largeur
-  if (WIDTH%2==0){
-    WIDTH+=1
-  }
+  if (WIDTH%2==0){WIDTH+=1}
   var HEIGHT: Int = hauteur
-  if (HEIGHT%2==0){
-    HEIGHT+=1
-  }
+  if (HEIGHT%2==0){HEIGHT+=1}
+  var visualize: Boolean = true
+
   val gameWindow : FunGraphics = new FunGraphics(WIDTH*Display.pixel_value,HEIGHT*Display.pixel_value)
   gameWindow.setKeyManager(new KeyAdapter(){
     override def keyPressed(e: KeyEvent): Unit = {
@@ -177,7 +178,8 @@ object JEU extends App{
       }
     }
   })
-  var maze: Array[Array[Int]] = Maze.generateMaze(WIDTH,HEIGHT)
+
+  var maze: Array[Array[Int]] = Maze.generateMaze(WIDTH,HEIGHT,visualize)
   maze(WIDTH-2)(HEIGHT-2) = 5 //end of the maze
 
   while(maze(WIDTH-2)(HEIGHT-2) == 5){
