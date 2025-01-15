@@ -186,8 +186,4 @@ object JEU extends App{
 
     JEU.gameWindow.syncGameLogic(60)
   }
-  if (maze(WIDTH-2)(HEIGHT-2) == 4){
-    JEU.gameWindow.setColor(Color.RED)
-    JEU.gameWindow.drawString(1,1,"YOU WIN")
-  }
 }
