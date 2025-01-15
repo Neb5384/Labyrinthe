@@ -9,36 +9,42 @@ object Display {
   def blit(grid: Array[Array[Int]]): Unit = {
     for ((x, xPos) <- grid.zipWithIndex;
          (y, yPos) <- x.zipWithIndex) {
-      if (y == 0) { // 1 in the grid is a wall
-        JEU.gameWindow.setColor(Color.WHITE)
-        JEU.gameWindow.drawFillRect(xPos*pixel_value, yPos*pixel_value, pixel_value, pixel_value)
-      }
       if (y == 1) { // 1 in the grid is a wall
         JEU.gameWindow.setColor(Color.BLACK)
         JEU.gameWindow.drawFillRect(xPos*pixel_value, yPos*pixel_value, pixel_value, pixel_value)
       }
       if (y == 4) { // 4 in the grid is the player
-        JEU.gameWindow.setColor(Color.RED)
+        JEU.gameWindow.setColor(Color.red)
         JEU.gameWindow.drawFilledCircle(xPos*pixel_value , yPos*pixel_value , pixel_value)
       }
     }
   }
 }
-object Player {
-  case class State(player: (Double, Double)) {
-    def newState(dir: Int): State = {
-      val (x, y) = player
-      val (newx, newy) = dir match {
-        case 1 => (x, y - 1) // up
-        case 2 => (x, y + 1) // down
-        case 3 => (x - 1, y) // left
-        case 4 => (x + 1, y) // right
-        case _ => (x, y)
+object Player{
+  var x: Int = 1
+  var y: Int = 1
+
+  def Nextpos {
+    JEU.maze(Player.x)(Player.y) = 0
+    JEU.gameWindow.setKeyManager(new KeyAdapter(){
+      override def keyPressed(e: KeyEvent): Unit = {
+        if (e.getKeyCode == KeyEvent.VK_UP) {
+          if(JEU.maze(Player.x)(Player.y-1) == 0) Player.y -= 1
+        }
+        if (e.getKeyCode == KeyEvent.VK_DOWN) {
+          if(JEU.maze(Player.x)(Player.y+1) == 0) Player.y += 1
+        }
+        if (e.getKeyCode == KeyEvent.VK_LEFT) {
+          if(JEU.maze(Player.x-1)(Player.y) == 0) Player.x -= 1
+        }
+        if (e.getKeyCode == KeyEvent.VK_RIGHT) {
+          if(JEU.maze(Player.x+1)(Player.y) == 0) Player.x += 1
+        }
       }
-      val newplayer: (Double, Double) = (newx, newy)
-      State (newplayer)
-    }
+    })
+    JEU.maze(Player.x)(Player.y) = 4
   }
+
 }
 
 
@@ -184,6 +190,9 @@ object JEU extends App{
 
   var visualize: Boolean = true
   var maze: Array[Array[Int]] = Maze.generateMaze(WIDTH,HEIGHT,visualize)
-  maze(1)(1)=4
-  Display.blit(maze)
+  while(true){
+    Player.Nextpos
+    Display.blit(maze)
+    Thread.sleep(500)
+  }
 }
