@@ -4,27 +4,29 @@ import java.awt.{Color, Rectangle}
 import scala.runtime.BooleanRef
 
 object Display {
-  val pixel_value: Int = 10
+  val pixel_value: Int = JEU.zoom
 
   def blit(grid: Array[Array[Int]]): Unit = {
-    JEU.gameWindow.clear()
-    for ((x, xPos) <- grid.zipWithIndex;
-         (y, yPos) <- x.zipWithIndex) {
-      if (y == 1) { // 0 in the grid is a pathway
-        JEU.gameWindow.setColor(Color.WHITE)
-        JEU.gameWindow.drawFillRect(xPos*pixel_value, yPos*pixel_value, pixel_value, pixel_value)
-      }
-      if (y == 1) { // 1 in the grid is a wall
-        JEU.gameWindow.setColor(Color.BLACK)
-        JEU.gameWindow.drawFillRect(xPos*pixel_value, yPos*pixel_value, pixel_value, pixel_value)
-      }
-      if (y == 4) { // 4 in the grid is the player
-        JEU.gameWindow.setColor(Color.red)
-        JEU.gameWindow.drawFilledCircle(xPos*pixel_value , yPos*pixel_value , pixel_value)
-      }
-      if (y == 5) { // 5 in the grid is the end
-        JEU.gameWindow.setColor(Color.BLUE)
-        JEU.gameWindow.drawFilledCircle(xPos*pixel_value , yPos*pixel_value , pixel_value)
+    JEU.gameWindow.frontBuffer.synchronized{
+      JEU.gameWindow.clear()
+      for ((x, xPos) <- grid.zipWithIndex;
+           (y, yPos) <- x.zipWithIndex) {
+        if (y == 0) { // 0 in the grid is a pathway
+          JEU.gameWindow.setColor(Color.WHITE)
+          JEU.gameWindow.drawFillRect(xPos*pixel_value, yPos*pixel_value, pixel_value, pixel_value)
+        }
+        if (y == 1) { // 1 in the grid is a wall
+          JEU.gameWindow.setColor(Color.BLACK)
+          JEU.gameWindow.drawFillRect(xPos*pixel_value, yPos*pixel_value, pixel_value, pixel_value)
+        }
+        if (y == 4) { // 4 in the grid is the player
+          JEU.gameWindow.setColor(Color.red)
+          JEU.gameWindow.drawFilledCircle(xPos*pixel_value , yPos*pixel_value , pixel_value)
+        }
+        if (y == 5) { // 5 in the grid is the end
+          JEU.gameWindow.setColor(Color.BLUE)
+          JEU.gameWindow.drawFilledCircle(xPos*pixel_value , yPos*pixel_value , pixel_value)
+        }
       }
     }
   }
@@ -146,11 +148,17 @@ object Maze {
 }
 
 object JEU extends App{
-  var WIDTH: Int = 16
+  print("enter your zoom value : ")
+  var zoom:Int = Input.readInt()
+  print("enter your Width value : ")
+  var largeur:Int = Input.readInt()
+  print("enter your Height value : ")
+  var hauteur:Int = Input.readInt()
+  var WIDTH: Int = largeur
   if (WIDTH%2==0){
     WIDTH+=1
   }
-  var HEIGHT: Int = 16
+  var HEIGHT: Int = hauteur
   if (HEIGHT%2==0){
     HEIGHT+=1
   }
@@ -179,6 +187,9 @@ object JEU extends App{
     Player.Nextpos
     Display.blit(maze)
 
-    JEU.gameWindow.syncGameLogic(10)
+    JEU.gameWindow.syncGameLogic(60)
+  }
+  if (maze(WIDTH-2)(HEIGHT-2) == 4){
+    println("You Win")
   }
 }
