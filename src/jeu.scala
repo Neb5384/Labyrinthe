@@ -154,45 +154,31 @@ def generateMaze(width: Int, height: Int ,visualize: Boolean = false): Array[Arr
     if (visualize && !foundNewStart){Display.blit(maze)}
   }
   while (!visitedAll)
-  println("maze generated !")
 
 
   maze
 }
 }
-/***
-object Player {
-  case class State(player: (Double, Double)) {
-    def newState(dir: Int): State = {
-      val (x, y) = player
-      val (newx, newy) = dir match {
-        case (e.getKeyCode == KeyEvent.VK_UP)  => (x, y - Display.pixel_value) // up
-        case (e.getKeyCode == KeyEvent.VK_DOWN)  => (x, y + Display.pixel_value) // down
-        case (e.getKeyCode == KeyEvent.VK_LEFT)  => (x - Display.pixel_value, y) // left
-        case (e.getKeyCode == KeyEvent.VK_RIGHT) => (x + Display.pixel_value, y) // right
-        case _ => (x, y)
-      }
-      val newplayer: (Double, Double) = (newx, newy)
-      State (newplayer)
-    }
-  }
-}
-***/
 
 object JEU extends App{
-  var WIDTH: Int = 148
-  var HEIGHT: Int = 96
+   var WIDTH: Int = 32
 
-  if (WIDTH%2==0) WIDTH+=1
-  if (HEIGHT%2==0) HEIGHT+=1
+  if (WIDTH%2==0){
+    WIDTH+=1
+  }
+  var HEIGHT: Int = 32
+  if (HEIGHT%2==0){
+    HEIGHT+=1
+  }
 
   val gameWindow : FunGraphics = new FunGraphics(WIDTH*Display.pixel_value,HEIGHT*Display.pixel_value)
 
-  var visualize: Boolean = true
-  var maze: Array[Array[Int]] = Maze.generateMaze(WIDTH,HEIGHT,visualize)
+  var maze: Array[Array[Int]] = Maze.generateMaze(WIDTH,HEIGHT)
+
   while(true){
     Player.Nextpos
     Display.blit(maze)
-    Thread.sleep(500)
+
+    JEU.gameWindow.syncGameLogic(60)
   }
 }
