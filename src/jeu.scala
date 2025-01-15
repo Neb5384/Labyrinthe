@@ -4,27 +4,29 @@ import java.awt.{Color, Rectangle}
 import scala.runtime.BooleanRef
 
 object Display {
-  val pixel_value: Int = 10
+  val pixel_value: Int = JEU.zoom
 
   def blit(grid: Array[Array[Int]]): Unit = {
-    JEU.gameWindow.clear()
-    for ((x, xPos) <- grid.zipWithIndex;
-         (y, yPos) <- x.zipWithIndex) {
-      if (y == 1) { // 0 in the grid nothing
-        JEU.gameWindow.setColor(Color.WHITE)
-        JEU.gameWindow.drawFillRect(xPos*pixel_value, yPos*pixel_value, pixel_value, pixel_value)
-      }
-      if (y == 1) { // 1 in the grid is a wall
-        JEU.gameWindow.setColor(Color.BLACK)
-        JEU.gameWindow.drawFillRect(xPos*pixel_value, yPos*pixel_value, pixel_value, pixel_value)
-      }
-      if (y == 4) { // 4 in the grid is the player
-        JEU.gameWindow.setColor(Color.red)
-        JEU.gameWindow.drawFilledCircle(xPos*pixel_value , yPos*pixel_value , pixel_value)
-      }
-      if (y == 5) { // 5 in the grid is the end
-        JEU.gameWindow.setColor(Color.BLUE)
-        JEU.gameWindow.drawFilledCircle(xPos*pixel_value , yPos*pixel_value , pixel_value)
+    JEU.gameWindow.frontBuffer.synchronized{
+      JEU.gameWindow.clear()
+      for ((x, xPos) <- grid.zipWithIndex;
+           (y, yPos) <- x.zipWithIndex) {
+        if (y == 0) { // 0 in the grid is a pathway
+          JEU.gameWindow.setColor(Color.WHITE)
+          JEU.gameWindow.drawFillRect(xPos*pixel_value, yPos*pixel_value, pixel_value, pixel_value)
+        }
+        if (y == 1) { // 1 in the grid is a wall
+          JEU.gameWindow.setColor(Color.BLACK)
+          JEU.gameWindow.drawFillRect(xPos*pixel_value, yPos*pixel_value, pixel_value, pixel_value)
+        }
+        if (y == 4) { // 4 in the grid is the player
+          JEU.gameWindow.setColor(Color.red)
+          JEU.gameWindow.drawFilledCircle(xPos*pixel_value , yPos*pixel_value , pixel_value)
+        }
+        if (y == 5) { // 5 in the grid is the end
+          JEU.gameWindow.setColor(Color.BLUE)
+          JEU.gameWindow.drawFilledCircle(xPos*pixel_value , yPos*pixel_value , pixel_value)
+        }
       }
     }
   }
@@ -33,27 +35,9 @@ object Player{
   var x: Int = 1
   var y: Int = 1
 
-  def Nextpos {
-    JEU.maze(Player.x)(Player.y) = 0
-    JEU.gameWindow.setKeyManager(new KeyAdapter(){
-      override def keyReleased(e: KeyEvent): Unit = {
-        if (e.getKeyCode == KeyEvent.VK_UP) {
-          if(JEU.maze(Player.x)(Player.y-1) != 1) Player.y -= 1
-        }
-        if (e.getKeyCode == KeyEvent.VK_DOWN) {
-          if(JEU.maze(Player.x)(Player.y+1) != 1) Player.y += 1
-        }
-        if (e.getKeyCode == KeyEvent.VK_LEFT) {
-          if(JEU.maze(Player.x-1)(Player.y) != 1) Player.x -= 1
-        }
-        if (e.getKeyCode == KeyEvent.VK_RIGHT) {
-          if(JEU.maze(Player.x+1)(Player.y) != 1) Player.x += 1
-        }
-      }
-    })
+  def Nextpos(): Unit = {
     JEU.maze(Player.x)(Player.y) = 4
   }
-
 }
 
 
@@ -166,19 +150,33 @@ object Maze {
 }
 
 object JEU extends App{
-  var WIDTH: Int = 96
-
-  if (WIDTH%2==0){
-    WIDTH+=1
-  }
-  var HEIGHT: Int = 96
-  if (HEIGHT%2==0){
-    HEIGHT+=1
-  }
+  var zoom = Dialogs.getHiddenString("please enter the zoom value").toInt
+  var largeur = Dialogs.getHiddenString("please enter the Width value").toInt
+  var hauteur = Dialogs.getHiddenString("please enter the Height value").toInt
+  var WIDTH: Int = largeur
+  if (WIDTH%2==0){WIDTH+=1}
+  var HEIGHT: Int = hauteur
+  if (HEIGHT%2==0){HEIGHT+=1}
+  var visualize: Boolean = true
 
   val gameWindow : FunGraphics = new FunGraphics(WIDTH*Display.pixel_value,HEIGHT*Display.pixel_value)
-
-  var visualize: Boolean = true
+  gameWindow.setKeyManager(new KeyAdapter(){
+    override def keyPressed(e: KeyEvent): Unit = {
+      maze(Player.x)(Player.y) = 0
+      if (e.getKeyCode == KeyEvent.VK_UP) {
+        if(maze(Player.x)(Player.y-1) != 1) Player.y -= 1
+      }
+      if (e.getKeyCode == KeyEvent.VK_DOWN) {
+        if(maze(Player.x)(Player.y+1) != 1) Player.y += 1
+      }
+      if (e.getKeyCode == KeyEvent.VK_LEFT) {
+        if(maze(Player.x-1)(Player.y) != 1) Player.x -= 1
+      }
+      if (e.getKeyCode == KeyEvent.VK_RIGHT) {
+        if(maze(Player.x+1)(Player.y) != 1) Player.x += 1
+      }
+    }
+  })
 
   var maze: Array[Array[Int]] = Maze.generateMaze(WIDTH,HEIGHT,visualize)
   maze(WIDTH-2)(HEIGHT-2) = 5 //end of the maze
@@ -187,6 +185,10 @@ object JEU extends App{
     Player.Nextpos
     Display.blit(maze)
 
-    JEU.gameWindow.syncGameLogic(10)
+    JEU.gameWindow.syncGameLogic(60)
+  }
+  if (maze(WIDTH-2)(HEIGHT-2) == 4){
+    JEU.gameWindow.setColor(Color.RED)
+    JEU.gameWindow.drawString(1,1,"YOU WIN")
   }
 }
