@@ -9,12 +9,16 @@ object Display {
   def blit(grid: Array[Array[Int]]): Unit = {
     for ((x, xPos) <- grid.zipWithIndex;
          (y, yPos) <- x.zipWithIndex) {
+      if (y == 0) { // 1 in the grid is a wall
+        JEU.gameWindow.setColor(Color.WHITE)
+        JEU.gameWindow.drawFillRect(xPos*pixel_value, yPos*pixel_value, pixel_value, pixel_value)
+      }
       if (y == 1) { // 1 in the grid is a wall
         JEU.gameWindow.setColor(Color.BLACK)
         JEU.gameWindow.drawFillRect(xPos*pixel_value, yPos*pixel_value, pixel_value, pixel_value)
       }
       if (y == 4) { // 4 in the grid is the player
-        JEU.gameWindow.setColor(Color.red)
+        JEU.gameWindow.setColor(Color.RED)
         JEU.gameWindow.drawFilledCircle(xPos*pixel_value , yPos*pixel_value , pixel_value)
       }
     }
@@ -53,8 +57,8 @@ object Maze {
       }
     15
   }
-def generateMaze(width: Int, height: Int): Array[Array[Int]] = {
-  var maze: Array[Array[Int]] = Array.ofDim[Int](width, height)
+def generateMaze(width: Int, height: Int ,visualize: Boolean = false): Array[Array[Int]] = {
+  var maze: Array[Array[Int]] = Array.ofDim[Int](width,height)
 
   for ((y, yPos) <- maze.zipWithIndex;
        (x, xPos) <- y.zipWithIndex) {
@@ -95,7 +99,7 @@ def generateMaze(width: Int, height: Int): Array[Array[Int]] = {
         validArray(1) = 1
       }
 
-      if (posX +1 >= cells.length) {
+      if (posX +1 >= cells(0).length) {
         validArray(2) = 0
       }else if(cells(posY)(posX+1) == 2 || cells(posY)(posX+1) == 3){
         validArray(2) = 0
@@ -129,16 +133,19 @@ def generateMaze(width: Int, height: Int): Array[Array[Int]] = {
       for (x <- cells; y <- x){
         if (y != 2) visitedAll = false
       }
+
+    var foundNewStart: Boolean = false
     if (direction == 15){
-      var foundNewStart: Boolean = false
       while (!foundNewStart){
         posY = (math.random()*cells.length).toInt
         posX = (math.random()*cells(0).length).toInt
         if(cells(posY)(posX) == 2){
           foundNewStart = true
+          println("FN")
         }
       }
     }
+    if (visualize && !foundNewStart){Display.blit(maze)}
   }
   while (!visitedAll)
   println("maze generated !")
@@ -149,15 +156,14 @@ def generateMaze(width: Int, height: Int): Array[Array[Int]] = {
 }
 /***
 object Player {
-
   case class State(player: (Double, Double)) {
     def newState(dir: Int): State = {
       val (x, y) = player
       val (newx, newy) = dir match {
-        case 1= (e.getKeyCode == KeyEvent.VK_UP)  => (x, y - Display.pixel_value) // up
-        case 2= (e.getKeyCode == KeyEvent.VK_DOWN)  => (x, y + Display.pixel_value) // down
-        case 3= (e.getKeyCode == KeyEvent.VK_LEFT)  => (x - Display.pixel_value, y) // left
-        case 4= (e.getKeyCode == KeyEvent.VK_RIGHT) => (x + Display.pixel_value, y) // right
+        case (e.getKeyCode == KeyEvent.VK_UP)  => (x, y - Display.pixel_value) // up
+        case (e.getKeyCode == KeyEvent.VK_DOWN)  => (x, y + Display.pixel_value) // down
+        case (e.getKeyCode == KeyEvent.VK_LEFT)  => (x - Display.pixel_value, y) // left
+        case (e.getKeyCode == KeyEvent.VK_RIGHT) => (x + Display.pixel_value, y) // right
         case _ => (x, y)
       }
       val newplayer: (Double, Double) = (newx, newy)
@@ -165,23 +171,19 @@ object Player {
     }
   }
 }
-**/
+***/
+
 object JEU extends App{
-  var WIDTH: Int = 96
-
-  if (WIDTH%2==0){
-    WIDTH+=1
-  }
+  var WIDTH: Int = 148
   var HEIGHT: Int = 96
-  if (HEIGHT%2==0){
-    HEIGHT+=1
-  }
 
-          val gameWindow : FunGraphics = new FunGraphics(WIDTH*Display.pixel_value,HEIGHT*Display.pixel_value)
+  if (WIDTH%2==0) WIDTH+=1
+  if (HEIGHT%2==0) HEIGHT+=1
 
-          var maze: Array[Array[Int]] = Maze.generateMaze(WIDTH,HEIGHT)
+  val gameWindow : FunGraphics = new FunGraphics(WIDTH*Display.pixel_value,HEIGHT*Display.pixel_value)
 
-          Display.blit(maze)
+  var visualize: Boolean = true
+  var maze: Array[Array[Int]] = Maze.generateMaze(WIDTH,HEIGHT,visualize)
   maze(1)(1)=4
-
-        }
+  Display.blit(maze)
+}
