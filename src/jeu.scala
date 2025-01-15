@@ -124,7 +124,6 @@ object Maze {
       }
 
       cells(posY)(posX) = 2
-      println(posX+" "+posY)
 
       visitedAll = true
       for (x <- cells; y <- x){
