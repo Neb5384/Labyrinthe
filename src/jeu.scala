@@ -7,14 +7,23 @@ object Display {
   val pixel_value: Int = 10
 
   def blit(grid: Array[Array[Int]]): Unit = {
+    JEU.gameWindow.clear()
     for ((x, xPos) <- grid.zipWithIndex;
          (y, yPos) <- x.zipWithIndex) {
+      if (y == 1) { // 0 in the grid nothing
+        JEU.gameWindow.setColor(Color.WHITE)
+        JEU.gameWindow.drawFillRect(xPos*pixel_value, yPos*pixel_value, pixel_value, pixel_value)
+      }
       if (y == 1) { // 1 in the grid is a wall
         JEU.gameWindow.setColor(Color.BLACK)
         JEU.gameWindow.drawFillRect(xPos*pixel_value, yPos*pixel_value, pixel_value, pixel_value)
       }
       if (y == 4) { // 4 in the grid is the player
         JEU.gameWindow.setColor(Color.red)
+        JEU.gameWindow.drawFilledCircle(xPos*pixel_value , yPos*pixel_value , pixel_value)
+      }
+      if (y == 5) { // 5 in the grid is the end
+        JEU.gameWindow.setColor(Color.BLUE)
         JEU.gameWindow.drawFilledCircle(xPos*pixel_value , yPos*pixel_value , pixel_value)
       }
     }
@@ -27,18 +36,18 @@ object Player{
   def Nextpos {
     JEU.maze(Player.x)(Player.y) = 0
     JEU.gameWindow.setKeyManager(new KeyAdapter(){
-      override def keyPressed(e: KeyEvent): Unit = {
+      override def keyReleased(e: KeyEvent): Unit = {
         if (e.getKeyCode == KeyEvent.VK_UP) {
-          if(JEU.maze(Player.x)(Player.y-1) == 0) Player.y -= 1
+          if(JEU.maze(Player.x)(Player.y-1) != 1) Player.y -= 1
         }
         if (e.getKeyCode == KeyEvent.VK_DOWN) {
-          if(JEU.maze(Player.x)(Player.y+1) == 0) Player.y += 1
+          if(JEU.maze(Player.x)(Player.y+1) != 1) Player.y += 1
         }
         if (e.getKeyCode == KeyEvent.VK_LEFT) {
-          if(JEU.maze(Player.x-1)(Player.y) == 0) Player.x -= 1
+          if(JEU.maze(Player.x-1)(Player.y) != 1) Player.x -= 1
         }
         if (e.getKeyCode == KeyEvent.VK_RIGHT) {
-          if(JEU.maze(Player.x+1)(Player.y) == 0) Player.x += 1
+          if(JEU.maze(Player.x+1)(Player.y) != 1) Player.x += 1
         }
       }
     })
@@ -51,44 +60,44 @@ object Player{
 object Maze {
 
   def randomInValid(array : Array[Int]): Int = {
-  var numOfValid: Int = 0
+    var numOfValid: Int = 0
     for (i <- array){
       if (i == 1) numOfValid += 1
-      }
+    }
     var ran: Int = (math.random() * numOfValid).toInt + 1
     var validcount: Int = 0
-      for (i <- array.indices){
-        if(array(i) == 1) validcount += 1
-          if (validcount == ran) return i
-      }
+    for (i <- array.indices){
+      if(array(i) == 1) validcount += 1
+      if (validcount == ran) return i
+    }
     15
   }
-def generateMaze(width: Int, height: Int ,visualize: Boolean = false): Array[Array[Int]] = {
-  var maze: Array[Array[Int]] = Array.ofDim[Int](width,height)
+  def generateMaze(width: Int, height: Int ,visualize: Boolean = false): Array[Array[Int]] = {
+    var maze: Array[Array[Int]] = Array.ofDim[Int](width,height)
 
-  for ((y, yPos) <- maze.zipWithIndex;
-       (x, xPos) <- y.zipWithIndex) {
-    if((yPos%2) == 0 || (xPos%2) == 0){
-      maze(yPos)(xPos) = 1
+    for ((y, yPos) <- maze.zipWithIndex;
+         (x, xPos) <- y.zipWithIndex) {
+      if((yPos%2) == 0 || (xPos%2) == 0){
+        maze(yPos)(xPos) = 1
+      }
     }
-  }
 
-  var cells: Array[Array[Int]] = Array.ofDim[Int]((width/2),(height/2))
+    var cells: Array[Array[Int]] = Array.ofDim[Int]((width/2),(height/2))
 
 
-  /***
-  * 0 -> unvisited
-  * 1 -> wall
-  * 2 -> visited
-  * 3 -> visited and backtracked
-  */
-  var posX: Int = 0
-  var posY: Int = 0
-  cells(0)(0) = 2
-  var visitedAll: Boolean = false
-  do{
-    var validArray: Array[Int] = new Array[Int](4) // Array that stores which values are valid
-    //left-down-right-up
+    /***
+     * 0 -> unvisited
+     * 1 -> wall
+     * 2 -> visited
+     * 3 -> visited and backtracked
+     */
+    var posX: Int = 0
+    var posY: Int = 0
+    cells(0)(0) = 2
+    var visitedAll: Boolean = false
+    do{
+      var validArray: Array[Int] = new Array[Int](4) // Array that stores which values are valid
+      //left-down-right-up
       if (posX -1 < 0) {
         validArray(0) = 0
       }else if(cells(posY)(posX -1) == 2 || cells(posY)(posX -1) == 3){
@@ -120,10 +129,8 @@ def generateMaze(width: Int, height: Int ,visualize: Boolean = false): Array[Arr
       }else{
         validArray(3) = 1
       }
-      println(validArray.mkString(" "))
 
       var direction: Int = randomInValid(validArray) // 0: left 1: down 2: right 3: up
-      println(direction)
       direction match{
         case 0 => maze(posY*2 +1)(posX*2 -1 +1) = 0; posX -= 1
         case 1 => maze(posY*2 -1 +1)(posX*2 +1) = 0; posY -= 1
@@ -133,40 +140,38 @@ def generateMaze(width: Int, height: Int ,visualize: Boolean = false): Array[Arr
       }
 
       cells(posY)(posX) = 2
-      println(posX+" "+posY)
 
       visitedAll = true
       for (x <- cells; y <- x){
         if (y != 2) visitedAll = false
       }
 
-    var foundNewStart: Boolean = false
-    if (direction == 15){
-      while (!foundNewStart){
-        posY = (math.random()*cells.length).toInt
-        posX = (math.random()*cells(0).length).toInt
-        if(cells(posY)(posX) == 2){
-          foundNewStart = true
-          println("FN")
+      var foundNewStart: Boolean = false
+      if (direction == 15){
+        while (!foundNewStart){
+          posY = (math.random()*cells.length).toInt
+          posX = (math.random()*cells(0).length).toInt
+          if(cells(posY)(posX) == 2){
+            foundNewStart = true
+          }
         }
       }
+      if (visualize && !foundNewStart){Display.blit(maze)}
     }
-    if (visualize && !foundNewStart){Display.blit(maze)}
+    while (!visitedAll)
+
+
+    maze
   }
-  while (!visitedAll)
-
-
-  maze
-}
 }
 
 object JEU extends App{
-   var WIDTH: Int = 32
+  var WIDTH: Int = 16
 
   if (WIDTH%2==0){
     WIDTH+=1
   }
-  var HEIGHT: Int = 32
+  var HEIGHT: Int = 16
   if (HEIGHT%2==0){
     HEIGHT+=1
   }
@@ -174,11 +179,12 @@ object JEU extends App{
   val gameWindow : FunGraphics = new FunGraphics(WIDTH*Display.pixel_value,HEIGHT*Display.pixel_value)
 
   var maze: Array[Array[Int]] = Maze.generateMaze(WIDTH,HEIGHT)
+  maze(WIDTH-2)(HEIGHT-2) = 5 //end of the maze
 
-  while(true){
+  while(maze(WIDTH-2)(HEIGHT-2) == 5){
     Player.Nextpos
     Display.blit(maze)
 
-    JEU.gameWindow.syncGameLogic(60)
+    JEU.gameWindow.syncGameLogic(10)
   }
 }
