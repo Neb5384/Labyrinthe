@@ -148,12 +148,9 @@ object Maze {
 }
 
 object JEU extends App{
-  print("enter your zoom value : ")
-  var zoom:Int = Input.readInt()
-  print("enter your Width value : ")
-  var largeur:Int = Input.readInt()
-  print("enter your Height value : ")
-  var hauteur:Int = Input.readInt()
+  var zoom = Dialogs.getHiddenString("please enter the zoom value").toInt
+  var largeur = Dialogs.getHiddenString("please enter the Width value").toInt
+  var hauteur = Dialogs.getHiddenString("please enter the Height value").toInt
   var WIDTH: Int = largeur
   if (WIDTH%2==0){
     WIDTH+=1
@@ -190,6 +187,7 @@ object JEU extends App{
     JEU.gameWindow.syncGameLogic(60)
   }
   if (maze(WIDTH-2)(HEIGHT-2) == 4){
-    println("You Win")
+    JEU.gameWindow.setColor(Color.RED)
+    JEU.gameWindow.drawString(1,1,"YOU WIN")
   }
 }
