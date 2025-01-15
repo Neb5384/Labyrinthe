@@ -36,6 +36,7 @@ object Player {
 
 
 object Maze {
+
   def randomInValid(array : Array[Int]): Int = {
   var numOfValid: Int = 0
     for (i <- array){
@@ -83,7 +84,7 @@ def generateMaze(width: Int, height: Int): Array[Array[Int]] = {
 
       if (posX +1 >= cells.length) {
         validArray(2) = 0
-      }else if(cells(posX+1)(posY) == 2 || cells(posX+1)(posY) == 3){
+      }else if(cells(posY)(posX+1) == 2 || cells(posY)(posX+1) == 3){
         validArray(2) = 0
       }else{
         validArray(2) = 1
@@ -105,6 +106,7 @@ def generateMaze(width: Int, height: Int): Array[Array[Int]] = {
         case 1 => posY -= 1
         case 2 => posX += 1
         case 3 => posY += 1
+        case _ =>
       }
 
       cells(posY)(posX) = 2
@@ -114,10 +116,24 @@ def generateMaze(width: Int, height: Int): Array[Array[Int]] = {
       for (x <- cells; y <- x){
         if (y != 2) visitedAll = false
       }
+    if (direction == 15){
+      var foundNewStart: Boolean = false
+      while (!foundNewStart){
+        posY = (math.random()*cells.length).toInt
+        posX = (math.random()*cells(0).length).toInt
+        if(cells(posY)(posX) == 2){
+          foundNewStart = true
+        }
+      }
+    }
   }
   while (!visitedAll)
+  println("maze generated !")
+
+
   maze
 }
+
 }
 
         object JEU extends App{
